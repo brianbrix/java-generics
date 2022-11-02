@@ -1,6 +1,5 @@
 package com.example.mygenerics.db.repository.services;
 
-import com.example.mygenerics.db.repository.GenericRepository;
 
 import java.util.Collection;
 import java.util.List;

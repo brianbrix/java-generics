@@ -10,6 +10,6 @@ import java.io.Serializable;
 @ToString
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 public class GenericModel implements Serializable {
 }
