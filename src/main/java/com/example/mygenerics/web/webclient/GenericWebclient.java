@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Log4j2
 public class GenericWebclient {
+    private static final long TIMEOUT = 5000;
+    private static final int CONNECT_TIMEOUT = 5000;
     /**
      *
      * @param url - String endpoint
@@ -120,11 +122,11 @@ public class GenericWebclient {
 
     private static WebClient myWebClient() {
         HttpClient httpClient = HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .responseTimeout(Duration.ofMillis(5000))
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIMEOUT)
+                .responseTimeout(Duration.ofMillis(TIMEOUT))
                 .doOnConnected(conn ->
-                        conn.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS))
-                                .addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS)));
+                        conn.addHandlerLast(new ReadTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS))
+                                .addHandlerLast(new WriteTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS)));
 
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
