@@ -1,5 +1,12 @@
 package com.example.mygenerics.extras;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 
 @Service
@@ -7,6 +14,9 @@ public class EntityManagerRepo {
     static List<Map<String, Object>> queryList = new LinkedList<>();
     private final EntityManagerFactory entityManagerFactory;
     private final BatchUpdater batchUpdater;
+
+    @Autowired
+    private ExecutorService executorService;
     private final String CPG_TRANSACTION_ID = "cpgTransactionID";
     private final String FILE_UPLOAD_ID = "fileUploadID";
     final String extractIDName ="extractID";
@@ -40,7 +50,8 @@ public class EntityManagerRepo {
             List<Map<String, Object>> list = new LinkedList<>(queryList);
             Logger.info("Running update for batch: "+ list);
             queryList.removeAll(list);
-            batchUpdater.write(list,false);
+            executorService.submit(()-> batchUpdater.write(list,false));
+
         }
 
         return 1;
