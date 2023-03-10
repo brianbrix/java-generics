@@ -5,6 +5,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,12 +19,14 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * This class provides a generic template for making POST and GET request
  */
 @Log4j2
 public class GenericWebclient {
+
     private static final long TIMEOUT = 5000;
     private static final int CONNECT_TIMEOUT = 5000;
     /**
@@ -40,6 +43,7 @@ public class GenericWebclient {
      * NOTE: Custom Exceptions must in order of 4xx to 5xx
      * E...  -> Array of custom exceptions
      */
+
     @SafeVarargs
     public  static<T extends GenericModel,V, E extends Exception> Mono<V> postForSingleObjResponse(String url, T request, Class<T> requestClass, Class<V> responseClass, E... exceptions) throws URISyntaxException {
     log.info("REQUEST: {}", request);
