@@ -17,7 +17,7 @@ public class BatchUpdater {
     public void write(List<Map<String, Object>> attributes, boolean isFinal) {
 
         Logger.info("Starting update... "+attributes);
-         String sql = "UPDATE reconFileExtracts SET matchStatus = ?, overallStatus = ?, updatedBy = ?, " +
+         String sql = "UPDATE table1 SET matchStatus = ?, overallStatus = ?, updatedBy = ?, " +
                 " overallStatusHistory= CONCAT(COALESCE(overallStatusHistory,''), IF(overallStatusHistory IS NULL,'',', ')," +
                 "?) WHERE reconFileExtractID = ? AND matchStatus IS NULL";
         JdbcTemplate jdbcTemplate = multitenantJdbcTemplateProvider.getJdbcTemplate();
@@ -46,7 +46,7 @@ public class BatchUpdater {
             else
             {
 
-                sql = "UPDATE reconFileExtracts SET description =?"
+                sql = "UPDATE table2 SET description =?"
                         + " ,updatedBy =?"
                         + " WHERE reconFileUploadID = ?";
                 pss = new BatchPreparedStatementSetter() {
