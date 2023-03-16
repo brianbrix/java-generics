@@ -9,6 +9,7 @@ public class BatchUpdater {
     MultitenantJdbcTemplateProvider multitenantJdbcTemplateProvider;
     @Autowired
     RedisRepoService redisRepoService;
+    //for multithreading you can use a ConcurrentLinkedQueue
 
     /**
      * @param attributes
