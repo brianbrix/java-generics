@@ -1,6 +1,4 @@
-package io.credable.reconapi.util;
-import io.credable.reconapi.dto.SftpConfigRequest;
-import io.credable.reconapi.exception.CustomException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.schmizz.sshj.SSHClient;
