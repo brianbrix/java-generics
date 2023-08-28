@@ -25,10 +25,12 @@ import java.util.function.Consumer;
  * This class provides a generic template for making POST and GET request
  */
 @Log4j2
-public class GenericWebclient {
+public class GenericWebClient {
 
     private static final long TIMEOUT = 5000;
     private static final int CONNECT_TIMEOUT = 5000;
+
+    private static  final Logger logger = LoggerFactory.getLogger(GenericWebClient.class);
     /**
      *
      * @param url - String endpoint
@@ -45,18 +47,22 @@ public class GenericWebclient {
      */
 
     @SafeVarargs
-    public  static<T extends GenericModel,V, E extends Exception> Mono<V> postForSingleObjResponse(String url, T request, Class<T> requestClass, Class<V> responseClass, E... exceptions) throws URISyntaxException {
-    log.info("REQUEST: {}", request);
+    public  static<T,V, E extends Exception> Mono<V> postForSingleObjResponse(String url, T request, Class<T> requestClass, Class<V> responseClass, E... exceptions) throws URISyntaxException {
+        logger.info("Making post for single object: "+request);
         return myWebClient().post()
                 .uri(new URI(url))
                 .body(Mono.just(request), requestClass)
                 .retrieve()
-                .onStatus(HttpStatus::is5xxServerError, error->Mono.error(exceptions.length>=1?exceptions[0]:new RuntimeException("Internal server error occurred.")))
-                .onStatus(HttpStatus::is4xxClientError, error->Mono.error(exceptions.length>=2?exceptions[1]:new RuntimeException("Bad Request Error.")))
+                .onStatus(HttpStatus::is5xxServerError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException("Internal server error occurred. Response: " + body))))
+                .onStatus(HttpStatus::is4xxClientError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException("Bad Request Error. Response: " + body))))
                 .bodyToMono(responseClass)
                 .onErrorResume(Mono::error)
-                .retryWhen(Retry.backoff(3,Duration.of(2, ChronoUnit.SECONDS)).onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) -> new Throwable(retrySignal.failure()))));
-
+                .retryWhen(Retry.backoff(3, Duration.of(2, ChronoUnit.SECONDS))
+                        .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) -> new Throwable(retrySignal.failure()))));
 
 
     }
@@ -73,15 +79,18 @@ public class GenericWebclient {
      * @throws URISyntaxException
      */
     @SafeVarargs
-    public  static<T extends GenericModel,V, E extends Exception> Flux<V> postForCollectionResponse(String url, T request, Class<T> requestClass, Class<V> responseClass, E... exceptions) throws URISyntaxException {
-        log.info("REQUEST: {}", request);
+    public  static<T ,V, E extends Exception> Flux<V> postForCollectionResponse(String url, T request, Class<T> requestClass, Class<V> responseClass, E... exceptions) throws URISyntaxException {
 
         return myWebClient().post()
                 .uri(new URI(url))
                 .body(Mono.just(request),requestClass)
                 .retrieve()
-                .onStatus(HttpStatus::is5xxServerError, error->Mono.error(exceptions.length>=1?exceptions[0]:new RuntimeException("Internal server error occurred.")))
-                .onStatus(HttpStatus::is4xxClientError, error->Mono.error(exceptions.length>=2?exceptions[1]:new RuntimeException("Bad Request Error.")))
+                .onStatus(HttpStatus::is5xxServerError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException("Internal server error occurred. Response: " + body))))
+                .onStatus(HttpStatus::is4xxClientError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException("Bad Request Error. Response: " + body))))
                 .bodyToFlux(responseClass);
 
     }
@@ -99,8 +108,12 @@ public class GenericWebclient {
         return myWebClient().get()
                 .uri(new URI(url))
                 .retrieve()
-                .onStatus(HttpStatus::is5xxServerError, error->Mono.error(exceptions.length>=1?exceptions[0]:new RuntimeException("Internal server error occurred.")))
-                .onStatus(HttpStatus::is4xxClientError, error->Mono.error(exceptions.length>=2?exceptions[1]:new RuntimeException("Bad Request Error.")))
+                .onStatus(HttpStatus::is5xxServerError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException("Internal server error occurred. Response: " + body))))
+                .onStatus(HttpStatus::is4xxClientError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException("Bad Request Error. Response: " + body))))
                 .bodyToFlux(responseClass);
 
     }
@@ -118,8 +131,12 @@ public class GenericWebclient {
         return myWebClient().get()
                 .uri(new URI(url))
                 .retrieve()
-                .onStatus(HttpStatus::is5xxServerError, error->Mono.error(exceptions.length>=1?exceptions[0]:new RuntimeException("Internal server error occurred.")))
-                .onStatus(HttpStatus::is4xxClientError, error->Mono.error(exceptions.length>=2?exceptions[1]:new RuntimeException("Bad Request Error.")))
+                .onStatus(HttpStatus::is5xxServerError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException("Internal server error occurred. Response: " + body))))
+                .onStatus(HttpStatus::is4xxClientError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException("Bad Request Error. Response: " + body))))
                 .bodyToMono(responseClass);
 
     }
@@ -143,3 +160,4 @@ public class GenericWebclient {
 
 
 }
+
